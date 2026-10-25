@@ -39,7 +39,7 @@ final class PickupAction implements ActionInterface, ApiAwareInterface
             foreach ($location['openingHours'] ?? [] as $slot) {
                 $n = array_search((string) ($slot['dayOfWeek'] ?? ''), ['', 'http://schema.org/Monday', 'http://schema.org/Tuesday', 'http://schema.org/Wednesday', 'http://schema.org/Thursday', 'http://schema.org/Friday', 'http://schema.org/Saturday', 'http://schema.org/Sunday'], true);
                 if ($n) {
-                    $hours[$n][] = [$slot['opens'] ?? '', $slot['closes'] ?? ''];
+                    $hours[$n][] = [substr((string) ($slot['opens'] ?? ''), 0, 5), substr((string) ($slot['closes'] ?? ''), 0, 5)]; // "HH:MM", seconds dropped
                 }
             }
             $points[] = new PickupPoint('dhl', (string) ($location['location']['ids'][0]['locationId'] ?? $location['url'] ?? ''), (string) ($location['name'] ?? 'DHL ServicePoint'),

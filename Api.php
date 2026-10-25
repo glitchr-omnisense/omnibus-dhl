@@ -58,9 +58,13 @@ final class Api
         }
         try {
             $response = $this->http->request('GET', self::LOCATIONS, ['headers' => ['DHL-API-Key' => $this->locationApiKey], 'query' => $query, 'timeout' => $this->timeout]);
+            $status = $response->getStatusCode();
             $data = $response->toArray(false);
         } catch (HttpExceptionInterface $e) {
             throw new CarrierException('dhl', 'DHL location finder failed: '.$e->getMessage(), null, $e);
+        }
+        if ($status >= 400) {
+            throw new CarrierException('dhl', (string) ($data['detail'] ?? $data['title'] ?? sprintf('DHL location finder answered HTTP %d.', $status)), isset($data['status']) ? (string) $data['status'] : null);
         }
 
         return $data;

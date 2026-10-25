@@ -37,7 +37,7 @@ final class DhlGatewayFactory extends GatewayFactory
             'omnibus.action.rating' => static fn (Config $c) => $c->get('rates') ? null : new RatingAction(),
             'omnibus.action.shipping' => new ShippingAction(),
             'omnibus.action.tracking' => new TrackingAction(),
-            'omnibus.action.pickup' => new PickupAction(),
+            'omnibus.action.pickup' => static fn (Config $c) => $c['location_api_key'] ? new PickupAction() : null, // service points need the Location Finder's key
         ]);
     }
 }

@@ -5,7 +5,7 @@ namespace Omnibus\Dhl\Tests;
 use Omnibus\Dhl\DhlGatewayFactory;
 use Omnibus\Exception\CarrierException;
 use Omnibus\Model\TrackingStatus;
-use Omnibus\Tests\Fixtures;
+use Omnibus\Testing\Fixtures;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -70,9 +70,9 @@ final class DhlGatewayTest extends TestCase
         $points = $this->gateway()->pickupPoints(Fixtures::shipment()->recipient);
         self::assertSame('8003-4SA3', $points[0]->id);
         self::assertSame(350, $points[0]->distance);
-        self::assertSame([['08:30:00', '19:00:00']], $points[0]->openingHours[1]);
+        self::assertSame([['08:30', '19:00']], $points[0]->openingHours[1]);
 
-        $this->expectException(CarrierException::class);
+        $this->expectException(\Omnibus\Exception\RequestNotSupportedException::class); // without its option, not offered
         $this->gateway(false)->pickupPoints(Fixtures::shipment()->recipient);
     }
 }
