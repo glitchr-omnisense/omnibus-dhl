@@ -104,6 +104,9 @@ the `trackingUrl` field of DHL's answer, which is not a document to download (se
 not"). A response without a number is a `CarrierException` (`DHL booked no shipment.`).
 `pickupPoint` is not sent: delivery to a service point is not booked by this package.
 
+> [!WARNING]
+> Known defect: `Label::$url` holds DHL's tracking page, where it should be a document to download (or `null`).
+
 **Track.** `GET` with `trackingView=all-checkpoints` and `levelOfDetail=all`; the locale is not
 sent. The events of the first shipment are read from their `date` and `time` (in PHP's default
 time zone, no offset), with DHL's `typeCode` as `code` and the first service area's description as
