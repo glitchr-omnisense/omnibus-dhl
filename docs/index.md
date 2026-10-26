@@ -1,6 +1,6 @@
 # omnibus/dhl
 
-DHL Express for [omniscient/omnibus](https://github.com/glitchr-studio/omnibus): rates, shipments
+DHL Express for [omnisense/omnibus](https://github.com/glitchr-omnisense/omnibus): rates, shipments
 and labels and tracking through the MyDHL API (HTTP basic authentication), and DHL service points
 through DHL's Location Finder (its own API key). The gateway calls:
 
@@ -21,7 +21,7 @@ Finder has one address, whatever `sandbox` says.
 composer require omnibus/dhl
 ```
 
-Requires PHP 8.2, `omniscient/omnibus` (2.x) and `symfony/http-client` (6.4, 7 or 8); given no
+Requires PHP 8.2, `omnisense/omnibus` (2.x) and `symfony/http-client` (6.4, 7 or 8); given no
 HTTP client, the factory makes one with `HttpClient::create()`. In a Symfony application with
 `Omnibus\Bridge\Symfony\OmnibusBundle`, the factory is registered as soon as the package is
 installed.
@@ -43,7 +43,7 @@ installed.
 | `account_number` | string | - | yes | the export account |
 | `sandbox` | bool | `false` | no | `true`: the MyDHL test environment |
 | `location_api_key` | ?string | `null` | no | the Location Finder's key; without it the gateway does not support `Pickup` |
-| `rates` | list | - | no | prices from configuration instead of `POST /rates` ([the rates option](https://github.com/glitchr-studio/omnibus/blob/2.x/docs/configuration.md#the-rates-option)): with it, the rates API is not called |
+| `rates` | list | - | no | prices from configuration instead of `POST /rates` ([the rates option](https://github.com/glitchr-omnisense/omnibus/blob/2.x/docs/configuration.md#the-rates-option)): with it, the rates API is not called |
 
 Shipment options (`Shipment::$options`):
 

@@ -1,6 +1,6 @@
 # omnibus/dhl
 
-DHL Express for [omniscient/omnibus](https://github.com/glitchr-studio/omnibus): rates, shipments
+DHL Express for [omnisense/omnibus](https://github.com/glitchr-omnisense/omnibus): rates, shipments
 and labels, tracking - the MyDHL API (basic auth) - and service points through DHL's Location
 Finder (its own API key).
 
@@ -8,7 +8,7 @@ Finder (its own API key).
 $gateway = (new DhlGatewayFactory($http))->create($options);   // $http: the application's HTTP client - none given, the factory makes its own; the options below
 ```
 
-No framework needed: the package requires `omniscient/omnibus` and `symfony/http-client`. In a
+No framework needed: the package requires `omnisense/omnibus` and `symfony/http-client`. In a
 Symfony application, the same through the bundle's configuration:
 
 ```yaml
