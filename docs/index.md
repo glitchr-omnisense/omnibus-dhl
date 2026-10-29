@@ -207,6 +207,12 @@ A missing `api_key`, `api_secret` or `account_number` is an `InvalidConfigExcept
 gateway is built; `GetSlip`, `Cancel`, `Paperless`, and `Pickup` without `location_api_key`, raise
 `RequestNotSupportedException` before any call.
 
+No failure carries the API key and secret and the location finder's key: a network error's message
+has them masked as `***` (the key parameters of a URL too), its previous is a copy of the HTTP
+client's exception (the same class and code), and no trace of the chain keeps its arguments, where
+the request's options stood ([No secret in a
+failure](https://github.com/glitchr-omnisense/omnibus/blob/2.x/docs/errors.md#no-secret-in-a-failure)).
+
 ## Verified, and not
 
 Tested offline: `Tests/DhlGatewayTest.php` (products cheapest first with their transit days, the

@@ -3,6 +3,7 @@
 namespace Omnibus\Dhl;
 
 use Omnibus\Exception\CarrierException;
+use Omnibus\Http\Redaction;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -38,13 +39,15 @@ final class Api
             $status = $response->getStatusCode();
             $data = json_decode($response->getContent(false), true);
         } catch (HttpExceptionInterface|\JsonException $e) {
-            throw new CarrierException('dhl', 'DHL request failed: '.$e->getMessage(), null, $e);
+            $secrets = $this->secrets();
+
+            throw Redaction::withoutArguments(new CarrierException('dhl', 'DHL request failed: '.Redaction::text($e->getMessage(), $secrets), null, Redaction::copy($e, $secrets)));
         }
         if (!\is_array($data)) {
-            throw new CarrierException('dhl', sprintf('DHL answered HTTP %d with a body that is not JSON.', $status));
+            throw Redaction::withoutArguments(new CarrierException('dhl', sprintf('DHL answered HTTP %d with a body that is not JSON.', $status)));
         }
         if ($status >= 400) {
-            throw new CarrierException('dhl', (string) ($data['detail'] ?? $data['message'] ?? $data['title'] ?? sprintf('HTTP %d', $status)), isset($data['status']) ? (string) $data['status'] : null);
+            throw Redaction::withoutArguments(new CarrierException('dhl', (string) ($data['detail'] ?? $data['message'] ?? $data['title'] ?? sprintf('HTTP %d', $status)), isset($data['status']) ? (string) $data['status'] : null));
         }
 
         return $data;
@@ -54,19 +57,31 @@ final class Api
     public function locations(array $query): array
     {
         if (null === $this->locationApiKey || '' === $this->locationApiKey) {
-            throw new CarrierException('dhl', 'Service points need the location finder\'s key (option location_api_key).');
+            throw Redaction::withoutArguments(new CarrierException('dhl', 'Service points need the location finder\'s key (option location_api_key).'));
         }
         try {
             $response = $this->http->request('GET', self::LOCATIONS, ['headers' => ['DHL-API-Key' => $this->locationApiKey], 'query' => $query, 'timeout' => $this->timeout]);
             $status = $response->getStatusCode();
             $data = $response->toArray(false);
         } catch (HttpExceptionInterface $e) {
-            throw new CarrierException('dhl', 'DHL location finder failed: '.$e->getMessage(), null, $e);
+            $secrets = $this->secrets();
+
+            throw Redaction::withoutArguments(new CarrierException('dhl', 'DHL location finder failed: '.Redaction::text($e->getMessage(), $secrets), null, Redaction::copy($e, $secrets)));
         }
         if ($status >= 400) {
-            throw new CarrierException('dhl', (string) ($data['detail'] ?? $data['title'] ?? sprintf('DHL location finder answered HTTP %d.', $status)), isset($data['status']) ? (string) $data['status'] : null);
+            throw Redaction::withoutArguments(new CarrierException('dhl', (string) ($data['detail'] ?? $data['title'] ?? sprintf('DHL location finder answered HTTP %d.', $status)), isset($data['status']) ? (string) $data['status'] : null));
         }
 
         return $data;
+    }
+
+    /**
+     * What a failure must not carry: the credentials, and what a request made of them.
+     *
+     * @return list<string>
+     */
+    private function secrets(string ...$more): array
+    {
+        return [$this->apiKey, $this->apiSecret, (string) $this->locationApiKey, ...$more];
     }
 }
