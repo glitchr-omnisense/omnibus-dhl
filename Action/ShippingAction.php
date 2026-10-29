@@ -61,6 +61,6 @@ final class ShippingAction implements ActionInterface, ApiAwareInterface
                 $content = base64_decode((string) $document['content']);
             }
         }
-        $request->setResult(new Label('dhl', $number, $content, Label::PDF, $data['trackingUrl'] ?? null, 'https://www.dhl.com/global-en/home/tracking.html?tracking-id='.rawurlencode($number)));
+        $request->setResult(new Label('dhl', $number, $content, Label::PDF, null, 'https://www.dhl.com/global-en/home/tracking.html?tracking-id='.rawurlencode($number)));
     }
 }

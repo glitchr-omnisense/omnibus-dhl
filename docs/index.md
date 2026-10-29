@@ -99,13 +99,10 @@ billing currency (`currencyType BILLC`; else the first total listed), `days`
 
 The tracking number is `shipmentTrackingNumber`; the label's content the document of type `label`,
 base64-decoded; the format `application/pdf`. `trackingUrl` is
-`https://www.dhl.com/global-en/home/tracking.html?tracking-id=<number>`. `Label::$url` is set to
-the `trackingUrl` field of DHL's answer, which is not a document to download (see "Verified, and
-not"). A response without a number is a `CarrierException` (`DHL booked no shipment.`).
+`https://www.dhl.com/global-en/home/tracking.html?tracking-id=<number>`. `Label::$url` is `null`:
+the label comes inline, and the `trackingUrl` field of DHL's answer is a MyDHL API address, not a
+document to download. A response without a number is a `CarrierException` (`DHL booked no shipment.`).
 `pickupPoint` is not sent: delivery to a service point is not booked by this package.
-
-> [!WARNING]
-> Known defect: `Label::$url` holds DHL's tracking page, where it should be a document to download (or `null`).
 
 **Track.** `GET` with `trackingView=all-checkpoints` and `levelOfDetail=all`; the locale is not
 sent. The events of the first shipment are read from their `date` and `time` (in PHP's default
@@ -220,9 +217,7 @@ recorded answers (`Pickup` supported only with `location_api_key`). The example 
 the core's harness on those recorded answers.
 
 Not verified: the README says the package is built from DHL's published API documentation and was
-not yet run against the test environment; that needs the credentials above. `Label::$url` carries
-the `trackingUrl` of DHL's booking answer (a MyDHL tracking address in the recorded answer), not a
-label to download: the label itself is in `content`.
+not yet run against the test environment; that needs the credentials above.
 
 ## Responsibility
 

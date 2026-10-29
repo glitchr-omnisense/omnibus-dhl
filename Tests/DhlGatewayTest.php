@@ -57,6 +57,14 @@ final class DhlGatewayTest extends TestCase
         self::assertSame('pdf', $this->calls[0][2]['outputImageProperties']['encodingFormat']);
     }
 
+    /** MyDHL API's createShipment: `trackingUrl` is an API address, the label comes inline in documents: Label::$url stays null (it is the document to download). */
+    public function testTheLabelHasNoDownloadUrlWhenItComesInline(): void
+    {
+        $label = $this->gateway()->ship(Fixtures::shipment());
+        self::assertNull($label->url);
+        self::assertStringStartsWith('https://www.dhl.com/', (string) $label->trackingUrl);
+    }
+
     public function testTrackingReadsTheEventsAndTheStatus(): void
     {
         $tracking = $this->gateway()->track('1234567890');
