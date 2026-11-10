@@ -1,0 +1,57 @@
+{
+    "$schema": "https://github.com/glitchr-omnisense/contracts/blob/1.x/resources/usage-policy.schema.json",
+    "provider": "dhl",
+    "rateLimits": [
+        {
+            "max": 500,
+            "window": "day",
+            "scope": "application",
+            "operations": [
+                "pickupPoints"
+            ],
+            "note": "Location Finder Unified, initial service level (more on request); 429 when exceeded."
+        },
+        {
+            "max": 1,
+            "window": "second",
+            "scope": "application",
+            "operations": [
+                "pickupPoints"
+            ],
+            "note": "Location Finder spike arrest (DHL support); not raised by an upgrade."
+        }
+    ],
+    "concurrency": null,
+    "rights": {
+        "commercial": "contract",
+        "openSourceRequired": false,
+        "caching": {
+            "permission": "contract",
+            "maxTtl": null
+        },
+        "storage": "forbidden",
+        "redistribution": "forbidden",
+        "attribution": {
+            "required": false,
+            "text": null,
+            "url": null,
+            "where": []
+        },
+        "licence": null
+    },
+    "requirements": {
+        "key": true,
+        "userAgent": {
+            "required": false,
+            "pattern": null
+        }
+    },
+    "provenance": {
+        "terms": "https://developer.dhl.com/terms-use",
+        "policy": "https://developer.dhl.com/api-reference/location-finder-unified",
+        "verifiedAt": "2026-11-10",
+        "declaredBy": "maintainer",
+        "contact": "https://support-developer.dhl.com",
+        "notes": "MyDHL API (rates, shipments, tracking): no production limit published; 500 calls a day in its test environment only. Terms of use: no indexing, caching or storing of content beyond what is technically necessary and temporary, no bypassing call limits. MyDHL: an active DHL Express account, used only for one's own DHL Express shipments; rating data neither stored, modified nor shown to third parties. Location data neither stored nor modified; next to other carriers' points, every DHL location at that address shown. MyDHL's Message-Reference header is echoed back but deduplicates nothing: a shipment is sent once."
+    }
+}

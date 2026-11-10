@@ -4,6 +4,8 @@ namespace Omnibus\Dhl;
 
 use Omnibus\Exception\CarrierException;
 use Omnibus\Http\Redaction;
+use Omnibus\Http\Throttle;
+use Omnisense\Contracts\Policy\Backoff;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -22,6 +24,8 @@ final class Api
         public readonly bool $sandbox = false,
         public readonly ?string $locationApiKey = null,
         private readonly int $timeout = 20,
+        /** The waits the carrier asks for (omnisense/contracts' Backoff): no call while one lasts, a 429 a RateLimitedException, never retried */
+        private readonly ?Backoff $backoff = null,
     ) {
     }
 
@@ -29,6 +33,7 @@ final class Api
     public function call(string $method, string $path, ?array $body = null, array $query = []): array
     {
         try {
+            Throttle::before($this->backoff);
             $response = $this->http->request($method, ($this->sandbox ? self::TEST : self::LIVE).$path, [
                 'auth_basic' => [$this->apiKey, $this->apiSecret],
                 'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json', 'Message-Reference' => bin2hex(random_bytes(16))],
@@ -37,6 +42,7 @@ final class Api
                 'timeout' => $this->timeout,
             ]);
             $status = $response->getStatusCode();
+            Throttle::after($this->backoff, 'dhl', $status, $response->getHeaders(false));
             $data = json_decode($response->getContent(false), true);
         } catch (HttpExceptionInterface|\JsonException $e) {
             $secrets = $this->secrets();
@@ -60,8 +66,10 @@ final class Api
             throw Redaction::withoutArguments(new CarrierException('dhl', 'Service points need the location finder\'s key (option location_api_key).'));
         }
         try {
+            Throttle::before($this->backoff);
             $response = $this->http->request('GET', self::LOCATIONS, ['headers' => ['DHL-API-Key' => $this->locationApiKey], 'query' => $query, 'timeout' => $this->timeout]);
             $status = $response->getStatusCode();
+            Throttle::after($this->backoff, 'dhl', $status, $response->getHeaders(false));
             $data = $response->toArray(false);
         } catch (HttpExceptionInterface $e) {
             $secrets = $this->secrets();

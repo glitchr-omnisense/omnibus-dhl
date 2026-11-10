@@ -190,6 +190,10 @@ omnibus:
                 location_api_key: '%env(DHL_LOCATION_KEY)%'   # leave it out: no service points
 ```
 
+## Usage policy
+
+`policy.json` (named in `composer.json`'s `extra.omnisense.policy`) declares Location Finder's 500 calls a day and 1 a second; MyDHL publishes no production limit (500 a day is its test environment's). DHL lets nothing be stored but what is technically necessary and temporary, and rating data never shown to third parties: `storage` and `redistribution` are `forbidden`. MyDHL's `Message-Reference` deduplicates nothing: a shipment is sent once. A 429 is a `RateLimitedException`, never retried, and the carrier's next calls wait for its `Retry-After`, unsent. See omnisense/omnibus' [Usage policies and rate limits](https://github.com/glitchr-omnisense/omnibus/blob/2.x/docs/policies.md).
+
 ## Errors
 
 Every failure is an `Omnibus\Exception\CarrierException` whose `carrier` is `dhl`:
