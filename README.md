@@ -4,6 +4,42 @@ DHL Express for [omnisense/omnibus](https://github.com/glitchr-omnisense/omnibus
 and labels, tracking - the MyDHL API (basic auth) - and service points through DHL's Location
 Finder (its own API key).
 
+## Install and a first call
+
+```sh
+composer require omnibus/dhl
+```
+
+No account for this first call: DHL Express's answer is recorded
+(`Omnibus\Testing\RecordedHttpClient` answers in place of the API), so nothing leaves the process.
+With your own credentials, give the factory your HTTP client (or none: it makes its own) and drop
+the recorded one.
+
+```php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Omnibus\Dhl\DhlGatewayFactory;
+use Omnibus\Testing\RecordedHttpClient;
+
+// DHL Express's answer, recorded: no account, and nothing leaves the process.
+$http = new RecordedHttpClient([
+    '/tracking' => ['shipments' => [['status' => 'Delivered', 'events' => [
+        ['date' => '2026-10-02', 'time' => '11:40:00', 'typeCode' => 'OK', 'description' => 'Delivered - Signed for by', 'serviceArea' => [['description' => 'BERLIN-DEU']]],
+    ]]]],
+]);
+$gateway = (new DhlGatewayFactory($http))->create(['api_key' => 'key', 'api_secret' => 'secret', 'account_number' => '123456789', 'sandbox' => true]);
+
+$tracking = $gateway->track('1234567890');
+echo $tracking->status->value, ' - ', $tracking->latest()?->description, "\n";   // delivered - Delivered - Signed for by
+```
+
+A real call needs a DHL Express account (the credentials below). The answer is shaped after DHL
+Express's published documentation; the package has not been run against its service yet.
+
+## Configuration
+
 ```php
 $gateway = (new DhlGatewayFactory($http))->create($options);   // $http: the application's HTTP client - none given, the factory makes its own; the options below
 ```
